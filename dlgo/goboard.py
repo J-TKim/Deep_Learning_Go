@@ -131,26 +131,23 @@ class Board:  # 주어진 열과 행 수의 빈 격자로 바둑판을 초기화
             return None
         return string
 
-    def _remove_string(self, string):
-        for point in string.stones:
-            for neighbor in point.neighbors():  # 이음을 제거하면 다른 이음에 활로가 생김
-                neighbor_string = self._grid.get(neighbor)
-                if neighbor_string is None:
-                    continue
-                if neighbor is not string:
-                    neighbor_string.with_liberty(point)
-            self._grid[point] = None
-
     def zobrist_hash(self):
         return self._hash
 
         
-class GameState():
+class GameState:
     def __init__(self, board, next_player, previous, move):
         self.board = board
         self.next_player = next_player
         self.previous_state = previous
+        if self.previous_state is None:
+            self.previous_states = frozenset()
+        else:
+            self.previous_states = frozenset(
+                previous.previous_states |
+                {(previous.next_player, previous.board.zobrist_hash())})
         self.last_move = move
+
 
     def apply_move(self, move):  # 수를 둔 후 새 GameState 반환
         if move.is_play:
@@ -194,13 +191,8 @@ class GameState():
             return False
         next_board = copy.deepcopy(self.board)
         next_board.place_stone(player, move.point)
-        next_situation = (player.other, next_board)
-        past_state = self.previous_state
-        while past_state is not None:
-            if past_state.situation == next_situation:
-                return True
-            past_state = past_state.previous_state
-        return False
+        next_situation = (player.other, next_board.zobrist_hash())
+        return next_situation in self.previous_states
     
     def is_valid_move(self, move): # 유효한 수 인지 확인
         if self.is_over():
