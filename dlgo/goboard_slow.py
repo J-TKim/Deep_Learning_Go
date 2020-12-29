@@ -3,8 +3,8 @@ from dlgo.gotypes import Player
 from dlgo.gotypes import Point
 
 
-class Move():
-    def __init__(self, point=None, is_pass=False, is_resign=False):  # 기사가 차례에 할 수 있는 행동을 설정
+class Move():  # 기사가 차례에 할 수 있는 행동을 설정
+    def __init__(self, point=None, is_pass=False, is_resign=False):
         assert (point is not None) ^ is_pass ^ is_resign
         self.point = point
         self.is_play = (self.point is not None)
@@ -84,7 +84,7 @@ class Board():  # 주어진 열과 행 수의 빈 격자로 바둑판을 초기�
         for same_color_string in adjacent_same_color:  # 같은 색의 근접한 이음을 합친다
             new_string = new_string.merged_with(same_color_string)
         for new_string_point in new_string.stones:
-            self._grid[new_string_point] = new_string_point
+            self._grid[new_string_point] = new_string
         for other_color_string in adjacent_opposite_color:  # 다른 색의 근접한 이음의 활로를 줄인다
             other_color_string.remove_liberty(point)
         for other_color_string in adjacent_opposite_color:  # 다른 색 이음의 활로가 0이 되면 그 돌을 제거한다
