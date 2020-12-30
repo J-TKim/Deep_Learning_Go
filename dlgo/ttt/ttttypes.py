@@ -4,7 +4,7 @@ from collections import namedtuple
 
 __all__ = [
     'Player',
-    'point'
+    'Point',
 ]
 
 
@@ -19,4 +19,5 @@ class Player(enum.Enum):
 
 class Point(namedtuple('Point', 'row col')):
     def __deepcopy__(self, memodict={}):
+        # These are very immutable.
         return self
