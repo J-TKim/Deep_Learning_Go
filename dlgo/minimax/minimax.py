@@ -1,6 +1,6 @@
 import enum
 import random
-from dlgo.agent import Agent
+from dlgo.agent.base import Agent
 
 
 class GameResult(enum.Enum):
@@ -9,7 +9,15 @@ class GameResult(enum.Enum):
     win = 3
 
 
-class minimaxAgent(Agent):
+def reverse_game_result(game_result):
+    if game_result == GameResult.loss:
+        return game_result.win
+    if game_result == GameResult.win:
+        return game_result.loss
+    return GameResult.draw
+
+
+class MinimaxAgent(Agent):
     def select_move(self, game_state):
         winning_moves = []
         draw_moves = []
