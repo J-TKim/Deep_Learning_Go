@@ -1,10 +1,11 @@
 import copy
 from dlgo.gotypes import Player
 from dlgo.gotypes import Point
+from dlgo.scoring import compute_game_result
 from dlgo import zobrist
 
 
-class Move():  # 기사가 차례에 할 수 있는 행동을 설정
+class Move:  # 기사가 차례에 할 수 있는 행동을 설정
     def __init__(self, point=None, is_pass=False, is_resign=False):
         assert (point is not None) ^ is_pass ^ is_resign
         self.point = point
@@ -203,3 +204,24 @@ class GameState:
             self.board.get(move.point) is None and
             not self.is_move_self_capture(self.next_player, move) and
             not self.does_move_violate_ko(self.next_player, move))
+
+    def legal_moves(self):
+        moves = []
+        for row in range(1, self.board.num_rows + 1):
+            for col in range(1, self.board.num_cols + 1):
+                move = Move.play(Point(row, col))
+                if self.is_valid_move(move):
+                    moves.append(move)
+        # These two moves are always legal.
+        moves.append(Move.pass_turn())
+        moves.append(Move.resign())
+
+        return moves
+
+    def winner(self):
+        if not self.is_over():
+            return None
+        if self.last_move.is_resign:
+            return self.next_player
+        game_result = compute_game_result(self)
+        return game_result.winner
