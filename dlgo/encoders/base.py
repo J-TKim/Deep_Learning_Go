@@ -2,7 +2,7 @@ import importlib
 
 __all__ = [
     'Encoder',
-    'get_encoder_by_name'.
+    'get_encoder_by_name',
 ]
 
 
